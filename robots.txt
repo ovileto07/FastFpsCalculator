@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+# Add your final domain sitemap URL before publishing.
