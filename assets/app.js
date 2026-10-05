@@ -75,29 +75,32 @@ function qualityFactor(game,quality){
  return q;
 }
 function resolutionScale(res){return R[res]||1;}
+// V13.1 FPS model: calibrated 1080p baseline + game difficulty multiplier + softer CPU/GPU blend.
+// The game profile is a difficulty factor (lower = heavier game), so it MUST multiply
+// the GPU ceiling rather than divide it. This fixes severe under/over-estimation on
+// games such as Rocket League, Cyberpunk 2077 and other GPU-heavy titles.
+const FPS_BASE_1080=650;
 function cpuCeiling(cpu,res,game){
  const c=cpuPerf(cpu);
  const resFactor=res<=720?1.12:res===1080?1:res===1440?.83:.68;
- const gameCpu=(GAME_PROFILE[game]||.68)>=.9?1.08:(GAME_PROFILE[game]||.68)<=.45?.94:1;
- return (0.42+c*0.72)*resFactor*gameCpu;
+ const gameScale=profileFor(game);
+ const gameCpu=0.88 + gameScale*0.12;
+ return (0.55+c*0.75)*resFactor*gameCpu;
 }
 function gpuCeiling(gpu,res,game){
  const p=gpuPerf(gpu), gameScale=profileFor(game);
- return p/gameScale*resolutionScale(res)*210;
+ return p*gameScale*resolutionScale(res)*FPS_BASE_1080;
 }
 function estimateFPS(cpu,gpu,game,res,quality,ram,upscaling,rt){
- const gScale=profileFor(game);
- let fps=gpuCeiling(gpu,res,game)*qualityFactor(game,quality)*(U[upscaling]||1);
- // CPU cap is modeled separately; use the lower of GPU and CPU ceilings with a smooth blend.
- const cpuCap=210*cpuCeiling(cpu,res,game)*qualityFactor(game,quality)*(U[upscaling]||1);
- const blended=1/((1/Math.max(1,fps))+(1/Math.max(1,cpuCap))*.18);
- fps=Math.max(10,blended);
+ let gpuFps=gpuCeiling(gpu,res,game)*qualityFactor(game,quality)*(U[upscaling]||1);
+ const cpuFps=FPS_BASE_1080*cpuCeiling(cpu,res,game)*qualityFactor(game,quality)*(U[upscaling]||1);
+ // GPU usually determines the ceiling; CPU limits are blended in without crushing the result.
+ let fps=1/((1/Math.max(1,gpuFps))+(1/Math.max(1,cpuFps))*.08);
  if(ram<16)fps*=.93; else if(ram>=32&&res<=1080)fps*=1.015;
  if(rt){
    const rtLoss=gpu[1]==='NVIDIA'&&gpu[0].startsWith('RTX')?.67:(gpu[1]==='AMD'&&/^RX (6|7|9)/.test(gpu[0])?.58:.48);
    fps*=rtLoss;
  }
- // Avoid impossible high results on older/lower-end combinations.
  return Math.max(8,Math.min(500, fps));
 }
 function bottleneck(cpu,gpu,game,res){
