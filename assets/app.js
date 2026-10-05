@@ -76,7 +76,7 @@ function qualityFactor(game,quality){
 }
 function resolutionScale(res){return R[res]||1;}
 /*
- * V13.2 FPS model:
+ * V13.1 FPS model:
  * - GPU score sets the main 1080p High ceiling.
  * - Game profile represents relative GPU demand.
  * - CPU ceiling is calculated separately so CPU-limited esports titles behave differently
@@ -87,20 +87,15 @@ function resolutionScale(res){return R[res]||1;}
 function cpuCeiling(cpu,res,game){
  const c=Math.max(.05,cpuPerf(cpu));
  const p=profileFor(game);
- // Higher game profile = generally lighter GPU load; CPU-heavy/esports titles
- // get a little more CPU pressure so fast GPUs do not hide a weak processor.
- const cpuLoad=1.12-.25*Math.min(1.2,p);
- const resFactor=res<=720?1.05:res===1080?1:res===1440?.96:.90;
- const base=58+275*Math.pow(c,.86)*cpuLoad;
- return base*resFactor;
+ const cpuLoad=.78+.40*p;
+ const base=55+260*Math.pow(c,.85)*cpuLoad;
+ return base*resolutionScale(res);
 }
 function gpuCeiling(gpu,res,game){
  const p=Math.max(.05,gpuPerf(gpu));
  const g=profileFor(game);
- // Calibrated relative GPU score with a game-demand term. The offset prevents
- // very old GPUs from collapsing to unrealistically tiny FPS values.
  const demand=.62+.58*g;
- const base=42+235*Math.pow(p,.78)*demand;
+ const base=42+190*Math.pow(p,.78)*demand;
  return base*resolutionScale(res);
 }
 function estimateFPS(cpu,gpu,game,res,quality,ram,upscaling,rt){
@@ -108,25 +103,29 @@ function estimateFPS(cpu,gpu,game,res,quality,ram,upscaling,rt){
  const u=U[upscaling]||1;
  const gpuFPS=gpuCeiling(gpu,res,game)*q*u;
  const cpuFPS=cpuCeiling(cpu,res,game)*q*u;
- const ratio=Math.min(1,cpuFPS/Math.max(1,gpuFPS));
- const gameProfile=profileFor(game);
- // CPU penalty is stronger for CPU-sensitive games and lighter for AAA titles.
- const cpuWeight=gameProfile>=.90?.42:gameProfile>=.70?.32:gameProfile>=.50?.25:.18;
- let fps=gpuFPS*(1-cpuWeight*(1-ratio));
+
+ // GPU is normally the primary limit. Apply a smooth penalty only when CPU
+ // capacity falls below the GPU ceiling, instead of forcing every result down.
+ const cpuRatio=Math.min(1,cpuFPS/Math.max(1,gpuFPS));
+ let fps=gpuFPS*(.72+.28*cpuRatio);
+
+ // Memory pressure is deliberately modest: RAM should matter, but not dominate.
  if(ram<16)fps*=.94;
  else if(ram>=32&&res<=1080)fps*=1.015;
+
  if(rt){
    const rtLoss=gpu[1]==='NVIDIA'&&gpu[0].startsWith('RTX')?.67:
      (gpu[1]==='AMD'&&/^RX (6|7|9)/.test(gpu[0])?.58:.48);
    fps*=rtLoss;
  }
+
  return Math.max(8,Math.min(500,fps));
 }
 function bottleneck(cpu,gpu,game,res){
  const gpuLimit=Math.max(1,gpuCeiling(gpu,res,game));
  const cpuLimit=Math.max(1,cpuCeiling(cpu,res,game));
  const pressure=cpuLimit<gpuLimit?(1-cpuLimit/gpuLimit)*100:0;
- return Math.round(Math.max(0,Math.min(45,pressure*.9)));
+ return Math.round(Math.max(0,Math.min(45,pressure*.82)));
 }
 function confidence(cpu,gpu,game){
  const direct=GAME_PROFILE[game]&&GPU_CAL[gpu[0]]&&CPU_CAL[cpu[0]];
