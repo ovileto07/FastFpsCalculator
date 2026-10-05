@@ -10,7 +10,7 @@
 <meta property="og:url" content="https://fastfpscalculator.com/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="FastFPSCalculator — PC FPS Calculator">
-<meta property="og:description" content="Model-based FPS estimates, hardware comparisons and PC upgrade analysis.">
+<meta property="og:description" content="Benchmark-calibrated FPS estimates, hardware comparisons and PC upgrade analysis.">
 <title>FastFPSCalculator — PC FPS Calculator</title>
 <style>
 
@@ -85,10 +85,9 @@ body{font-size:14px}
 </script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"FastFPSCalculator","url":"https://fastfpscalculator.com/","potentialAction":{"@type":"SearchAction","target":"https://fastfpscalculator.com/explore.html?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9521597868742348" crossorigin="anonymous"></script>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192">
-<link rel="shortcut icon" href="/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 <body>
 <header class="header">
@@ -159,7 +158,7 @@ body{font-size:14px}
     <div class="result-box"><small>BOTTLENECK</small><strong id="bottle">—%</strong><div class="bar"><i id="bar"></i></div><h3 id="balanceTitle">—</h3><p id="balanceText">—</p></div>
   </div>
   <div class="result-details"><div><small>PROCESSOR</small><b id="outCpu">—</b></div><div><small>GRAPHICS CARD</small><b id="outGpu">—</b></div><div><small>RESOLUTION</small><b id="outRes">—</b></div><div><small>QUALITY</small><b id="outQuality">—</b></div></div>
-  <p class="note">Model-based estimate. Actual FPS can vary with drivers, game updates, memory configuration, temperatures, background processes and the exact in-game scene.</p>
+  <p class="note">Benchmark-calibrated estimate. Actual FPS can vary with drivers, game updates, memory configuration, temperatures, background processes and the exact in-game scene.</p>
 </section>
 
 <section id="popular" class="popular">
@@ -319,33 +318,56 @@ const GPU_CAL={
  "RTX 4070 SUPER":.61,"RTX 4070":.55,"RTX 3080":.54,"RX 7800 XT":.54,"RX 7900 GRE":.55,"RTX 3070 Ti":.50,"RTX 3070":.47,"RX 6800 XT":.50,"RX 6800":.45,"RX 7700 XT":.45,"RTX 4060 Ti 16GB":.39,"RTX 4060 Ti 8GB":.39,"RX 6750 XT":.40,"RX 6700 XT":.38,"RTX 4060":.36,"RX 7600 XT":.36,"RX 7600":.34,"RTX 3060 Ti":.40,"RTX 3060":.30,"RX 6600 XT":.31,"RX 6600":.28,"RTX 3050":.22,"GTX 1660 SUPER":.21,"GTX 1660 Ti":.21,"GTX 1660":.19,"GTX 1080 Ti":.29,"GTX 1080":.23,"GTX 1070 Ti":.22,"GTX 1070":.20,"GTX 1060 6GB":.15,"RX 5700 XT":.24,"RX 5700":.20,"RX 5600 XT":.19,"RX 580 8GB":.13,"RX 570 4GB":.11
 };
 const CPU_CAL={
- "Intel Core i3-12100F":.673,"Intel Core i3-13100F":.710,"Intel Core i3-14100F":.72,"Intel Core i5-12400F":.695,"Intel Core i5-12600K":.786,"Intel Core i5-12600KF":.786,"Intel Core i5-13400F":.740,"Intel Core i5-13600K":.824,"Intel Core i5-14400F":.754,"Intel Core i5-14600K":.858,"Intel Core i5-14600KF":.858,"Intel Core i7-12700K":.797,"Intel Core i7-13700K":.867,"Intel Core i7-14700K":.901,"Intel Core i9-13900K":.924,"Intel Core i9-14900K":.954,"AMD Ryzen 5 5500":.600,"AMD Ryzen 5 5600":.635,"AMD Ryzen 7 5700X":.670,"AMD Ryzen 7 5800X3D":.659,"AMD Ryzen 5 7500F":.65,"AMD Ryzen 5 7600":.715,"AMD Ryzen 7 7800X3D":.88,"AMD Ryzen 7 9700X":.906,"AMD Ryzen 7 9800X3D":.970,"AMD Ryzen 9 9900X":.93,"AMD Ryzen 9 9950X":.957,"AMD Ryzen 7 9850X3D":1
+ "Intel Core i3-12100F":.673,"Intel Core i3-13100F":.710,"Intel Core i3-14100F":.192,"Intel Core i5-12400F":.695,"Intel Core i5-12600K":.786,"Intel Core i5-12600KF":.786,"Intel Core i5-13400F":.740,"Intel Core i5-13600K":.824,"Intel Core i5-14400F":.754,"Intel Core i5-14600K":.858,"Intel Core i5-14600KF":.858,"Intel Core i7-12700K":.797,"Intel Core i7-13700K":.867,"Intel Core i7-14700K":.901,"Intel Core i9-13900K":.924,"Intel Core i9-14900K":.954,"AMD Ryzen 5 5500":.600,"AMD Ryzen 5 5600":.635,"AMD Ryzen 7 5700X":.670,"AMD Ryzen 7 5800X3D":.659,"AMD Ryzen 5 7500F":.66,"AMD Ryzen 5 7600":.715,"AMD Ryzen 7 7800X3D":.773,"AMD Ryzen 7 9700X":.906,"AMD Ryzen 7 9800X3D":.970,"AMD Ryzen 9 9900X":.739,"AMD Ryzen 9 9950X":.957,"AMD Ryzen 7 9850X3D":1
 };
 const GAME_PROFILE={
  "Minecraft":.82,"Fortnite":.82,"Rocket League":.92,"Counter-Strike 2":1.02,"Valorant":1.14,"Call of Duty: Warzone":.67,"Grand Theft Auto V":.74,"Grand Theft Auto V Enhanced":.55,"Red Dead Redemption 2":.60,"Cyberpunk 2077":.47,"Elden Ring":.72,"Hogwarts Legacy":.52,"Helldivers 2":.49,"Warhammer 40,000: Space Marine 2":.42,"Monster Hunter Wilds":.43,"Black Myth: Wukong":.40,"The Last of Us Part II":.48,"Horizon Forbidden West":.54,"God of War Ragnarök":.55,"Marvel's Spider-Man 2":.45,"Forza Horizon 5":.62,"Forza Motorsport":.50,"Apex Legends":.82,"Overwatch 2":.96,"PUBG: Battlegrounds":.76,"Rainbow Six Siege":1.05,"DOOM Eternal":1.10,"DOOM: The Dark Ages":.46,"Dying Light 2":.55,"Resident Evil 4":.64,"Starfield":.43,"Baldur's Gate 3":.58,"Dragon's Dogma 2":.39,"Assassin's Creed Shadows":.38,"Alan Wake 2":.35,"S.T.A.L.K.E.R. 2":.34,"ARC Raiders":.45,"Marvel Rivals":.63,"Battlefield 2042":.57,"Battlefield 6":.55,"Escape from Tarkov":.52,"Cities: Skylines II":.35,"Assetto Corsa Competizione":.52
 };
+function gpuPerf(g){return GPU_CAL[g[0]]||g[2];}
+function cpuPerf(c){return CPU_CAL[c[0]]||Math.min(1,c[1]/1.42);}
+function profileFor(game){return GAME_PROFILE[game]||.68;}
+function qualityFactor(game,quality){
+ let q=Q[quality]||1;
+ // Competitive/CPU-heavy games lose less from visual quality than heavy raster titles.
+ if((game==='Valorant'||game==='Counter-Strike 2'||game==='League of Legends'||game==='Dota 2')&&quality==='Ultra')q=0.84;
+ return q;
+}
+function resolutionScale(res){return R[res]||1;}
+function cpuCeiling(cpu,res,game){
+ const c=cpuPerf(cpu);
+ const resFactor=res<=720?1.12:res===1080?1:res===1440?.83:.68;
+ const gameCpu=(GAME_PROFILE[game]||.68)>=.9?1.08:(GAME_PROFILE[game]||.68)<=.45?.94:1;
+ return (0.42+c*0.72)*resFactor*gameCpu;
+}
+function gpuCeiling(gpu,res,game){
+ const p=gpuPerf(gpu), gameScale=profileFor(game);
+ return p/gameScale*resolutionScale(res)*210;
+}
 function estimateFPS(cpu,gpu,game,res,quality,ram,upscaling,rt){
- const q=qualityFactor(game,quality);
- const u=U[upscaling]||1;
- const gpuFPS=gpuCeiling(gpu,res,game)*q*u;
- const cpuFPS=cpuCeiling(cpu,res,game)*q*u;
-
- // GPU is normally the primary limit. Apply a smooth penalty only when CPU
- // capacity falls below the GPU ceiling, instead of forcing every result down.
- const cpuRatio=Math.min(1,cpuFPS/Math.max(1,gpuFPS));
- let fps=gpuFPS*(.72+.28*cpuRatio);
-
- // Memory pressure is deliberately modest: RAM should matter, but not dominate.
- if(ram<16)fps*=.94;
- else if(ram>=32&&res<=1080)fps*=1.015;
-
+ const gScale=profileFor(game);
+ let fps=gpuCeiling(gpu,res,game)*qualityFactor(game,quality)*(U[upscaling]||1);
+ // CPU cap is modeled separately; use the lower of GPU and CPU ceilings with a smooth blend.
+ const cpuCap=210*cpuCeiling(cpu,res,game)*qualityFactor(game,quality)*(U[upscaling]||1);
+ const blended=1/((1/Math.max(1,fps))+(1/Math.max(1,cpuCap))*.18);
+ fps=Math.max(10,blended);
+ if(ram<16)fps*=.93; else if(ram>=32&&res<=1080)fps*=1.015;
  if(rt){
-   const rtLoss=gpu[1]==='NVIDIA'&&gpu[0].startsWith('RTX')?.67:
-     (gpu[1]==='AMD'&&/^RX (6|7|9)/.test(gpu[0])?.58:.48);
+   const rtLoss=gpu[1]==='NVIDIA'&&gpu[0].startsWith('RTX')?.67:(gpu[1]==='AMD'&&/^RX (6|7|9)/.test(gpu[0])?.58:.48);
    fps*=rtLoss;
  }
-
- return Math.max(8,Math.min(500,fps));
+ // Avoid impossible high results on older/lower-end combinations.
+ return Math.max(8,Math.min(500, fps));
+}
+function bottleneck(cpu,gpu,game,res){
+ const cp=cpuPerf(cpu),gp=gpuPerf(gpu);
+ const cpuWeight=res<=1080?1:res===1440?.72:.52;
+ const gameCpu=(profileFor(game)>=.9?1.12:profileFor(game)<=.45?.90:1);
+ const cpuPressure=Math.max(0,(gp*.95-(cp*cpuWeight*gameCpu)))/(Math.max(.2,gp))*100;
+ return Math.round(Math.max(0,Math.min(45,cpuPressure*.72)));
+}
+function confidence(cpu,gpu,game){
+ const direct=GAME_PROFILE[game]&&GPU_CAL[gpu[0]]&&CPU_CAL[cpu[0]];
+ return direct?'High':'Medium';
 }
 function calculate(){
  const g=DATA.games[state.game],gpu=DATA.gpus[state.gpu],cpu=DATA.cpus[state.cpu],ram=+$('ram').value;
@@ -377,7 +399,7 @@ function initTools(){
  $('cpuA').value=DATA.cpus.findIndex(x=>x[0]==='AMD Ryzen 5 5600');$('cpuB').value=DATA.cpus.findIndex(x=>x[0]==='Intel Core i5-12400F');$('cpuGpu').value=DATA.gpus.findIndex(x=>x[0]==='RTX 3060');$('cpuGame').value=DATA.games.indexOf('Cyberpunk 2077');
  $('upCpu').value=DATA.cpus.findIndex(x=>x[0]==='AMD Ryzen 5 5600');$('upGpu').value=DATA.gpus.findIndex(x=>x[0]==='RTX 3060');$('upGame').value=DATA.games.indexOf('Cyberpunk 2077');$('upRes').value=1080;
 }
-function compHTML(aName,aF,bName,bF){const delta=((bF/aF-1)*100);const faster=delta>=0?bName:aName;const diff=Math.abs(delta).toFixed(1);return `<div class="compare-bars"><div class="compare-box"><small>${aName}</small><strong>${Math.round(aF)}</strong><span>estimated FPS</span></div><div class="compare-box"><small>${bName}</small><strong>${Math.round(bF)}</strong><span>estimated FPS</span></div></div><div class="delta">${faster} is estimated ${diff}% faster in this configuration.</div><div class="tool-note">Model-based estimate using relative hardware performance. Actual FPS varies with drivers, game version, memory and scene complexity.</div>`;}
+function compHTML(aName,aF,bName,bF){const delta=((bF/aF-1)*100);const faster=delta>=0?bName:aName;const diff=Math.abs(delta).toFixed(1);return `<div class="compare-bars"><div class="compare-box"><small>${aName}</small><strong>${Math.round(aF)}</strong><span>estimated FPS</span></div><div class="compare-box"><small>${bName}</small><strong>${Math.round(bF)}</strong><span>estimated FPS</span></div></div><div class="delta">${faster} is estimated ${diff}% faster in this configuration.</div><div class="tool-note">Benchmark-calibrated estimate. Results vary with game version, drivers, memory and scene complexity.</div>`;}
 $('gpuCompare').onclick=()=>{const a=DATA.gpus[+$('gpuA').value],b=DATA.gpus[+$('gpuB').value],g=DATA.games[+$('gpuGame').value],r=+$('gpuRes').value,cpu=DATA.cpus.find(x=>x[0]==='AMD Ryzen 7 9800X3D')||DATA.cpus[DATA.cpus.length-3];const af=estimateFPS(cpu,a,g,r,'High',32,'off',false),bf=estimateFPS(cpu,b,g,r,'High',32,'off',false);$('gpuCompareResult').innerHTML=compHTML(a[0],af,b[0],bf);$('gpuCompareResult').classList.remove('hidden')};
 $('cpuCompare').onclick=()=>{const a=DATA.cpus[+$('cpuA').value],b=DATA.cpus[+$('cpuB').value],g=DATA.games[+$('cpuGame').value],gpu=DATA.gpus[+$('cpuGpu').value],r=1080,af=estimateFPS(a,gpu,g,r,'High',32,'off',false),bf=estimateFPS(b,gpu,g,r,'High',32,'off',false);$('cpuCompareResult').innerHTML=compHTML(a[0],af,b[0],bf);$('cpuCompareResult').classList.remove('hidden')};
 $('runUpgrade').onclick=()=>{const cpu=DATA.cpus[+$('upCpu').value],gpu=DATA.gpus[+$('upGpu').value],g=DATA.games[+$('upGame').value],r=+$('upRes').value,current=estimateFPS(cpu,gpu,g,r,'High',16,'off',false);let gpuUps=DATA.gpus.map((x,i)=>({x,i,f:estimateFPS(cpu,x,g,r,'High',16,'off',false)})).filter(x=>x.f>current*1.12).sort((a,b)=>a.f-b.f).slice(0,3);let cpuUps=DATA.cpus.map((x,i)=>({x,i,f:estimateFPS(x,gpu,g,r,'High',16,'off',false)})).filter(x=>x.f>current*1.12).sort((a,b)=>a.f-b.f).slice(0,3);let rows=[...gpuUps.map(x=>`<div class="upgrade-item"><div><b>${x.x[0]}</b><small>GPU upgrade · +${Math.round(x.f-current)} FPS estimated</small></div><strong>${Math.round(x.f)} FPS</strong></div>`),...cpuUps.map(x=>`<div class="upgrade-item"><div><b>${x.x[0]}</b><small>CPU upgrade · +${Math.round(x.f-current)} FPS estimated</small></div><strong>${Math.round(x.f)} FPS</strong></div>`)];$('upgradeResult').innerHTML=`<div class="tool-note" style="margin:0 0 9px">Current estimate: <b>${Math.round(current)} FPS</b> · showing practical upgrades above the current result.</div><div class="upgrade-list">${rows.length?rows.join(''):'<div class="tool-note">No upgrade in the current database clears the 12% threshold for this configuration.</div>'}</div>`;$('upgradeResult').classList.remove('hidden')};
