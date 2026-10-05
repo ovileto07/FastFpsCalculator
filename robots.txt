@@ -1,8 +1,3 @@
-FastFPSCalculator V13.1
-
-AdSense status: CODE INSTALLED
-
-The exact AdSense publisher script supplied by Google for this site is present in every HTML page <head>.
-Publisher: ca-pub-9521597868742348
-
-No ad units were invented or inserted. This change only adds the account verification/loader script Google supplied.
+User-agent: *
+Allow: /
+Sitemap: https://fastfpscalculator.com/sitemap.xml
