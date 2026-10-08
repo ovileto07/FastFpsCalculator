@@ -93,7 +93,7 @@ body{font-size:14px}
 <body>
 <header class="header">
   <div class="wrap header-inner">
-    <a class="logo" href="/"><svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><defs><linearGradient id="fastfpsLogoGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1255d8"/><stop offset="1" stop-color="#ef3f42"/></linearGradient></defs><rect x="2" y="2" width="44" height="44" rx="11" fill="url(#fastfpsLogoGradient)"/><path d="M14 12h20v6H20v6h11v6H20v6h-6V12z" fill="#fff"/><path d="M31 30l5 4-5 4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>FastFPS<span>Calculator</span></span></a>
+    <a class="logo" href="/"><svg class="brand-mark" width="30" height="30" style="width:30px;height:30px;display:block;flex:none" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><defs><linearGradient id="fastfpsLogoGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1255d8"/><stop offset="1" stop-color="#ef3f42"/></linearGradient></defs><rect x="2" y="2" width="44" height="44" rx="11" fill="url(#fastfpsLogoGradient)"/><path d="M14 12h20v6H20v6h11v6H20v6h-6V12z" fill="#fff"/><path d="M31 30l5 4-5 4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>FastFPS<span>Calculator</span></span></a>
     <nav><a class="active" href="#calculator">FPS Calculator</a><a href="#popular">Popular Games</a><a href="#tools">Comparisons</a><a href="#methodology">Methodology</a><a href="explore.html">Explore</a></nav>
     <button id="menu" class="menu">☰</button>
   </div>
@@ -313,39 +313,163 @@ $("rt").onclick=()=>{state.rt=!state.rt;$("rt").textContent=state.rt?"On":"Off";
 
 const Q={Low:1.34,Medium:1.16,High:1,Ultra:.78},R={720:1.56,1080:1,1440:.69,2160:.43},U={off:1,quality:1.13,balanced:1.23,performance:1.34};
 
-/* Benchmark anchors. Scores are normalized to the current top reference. Modern entries are aligned to Tom's Hardware 2026 hierarchy; legacy cards fall back to the original relative score. */
+/*
+  Benchmark engine v2
+  -------------------
+  GPU anchors use measured 2026 1080p/1440p/4K raster results from Tom's Hardware.
+  CPU scores are normalized gaming scores from the same benchmark hierarchy where
+  available. For games with direct public benchmark anchors, the model scales from
+  those measured results instead of inventing an absolute FPS number.
+  Games without a direct anchor use the measured GPU hierarchy plus a conservative
+  workload profile. Results remain estimates because a single benchmark setup
+  cannot reproduce every PC, patch, driver, map and settings combination.
+*/
+const GPU_BENCH={
+ "RTX 5090":[203.8,167.3,110.8],"RTX 4090":[183.6,143.4,89.1],"RTX 5080":[166.9,128.3,77.4],
+ "RX 7900 XTX":[161.5,122.3,70.6],"RTX 4080 SUPER":[158.9,118.6,69.4],"RTX 4080":[157.3,117.5,67.5],
+ "RTX 5070 Ti":[155.4,116.8,68.6],"RX 9070 XT":[156.6,116.5,65.8],"RX 7900 XT":[145.4,108.0,59.8],
+ "RTX 4070 Ti SUPER":[141.2,104.0,58.5],"RX 9070":[140.9,104.0,57.7],"RTX 3090 Ti":[131.7,99.9,59.3],
+ "RTX 4060 Ti 16GB":[89.3,60.5,31.3],"RX 7600 XT":[102.1,50.2,25.5],"RTX 3070":[87.2,58.2,26.2],
+ "RTX 4060 Ti 8GB":[88.0,58.9,23.9],"RX 6750 XT":[83.2,57.6,29.6],"RTX 5060":[88.5,59.8,21.8],
+ "RX 6700 XT":[79.2,54.3,28.0],"Intel Arc B580":[71.5,50.7,27.6],"RTX 3060 Ti":[74.2,51.0,19.4],
+ "RTX 4060":[71.5,47.6,17.4],"RX 7600":[69.9,45.4,18.4],"RTX 5050":[69.3,45.2,17.0],
+ "Intel Arc B570":[63.5,44.3,19.6],"RTX 3060":[61.5,41.9,22.2],"RX 6650 XT":[64.3,38.0,19.0],
+ "RX 6600 XT":[62.7,40.7,17.3],"RX 6600":[51.9,24.8,14.5],"RTX 3050":[44.6,29.8,12.6]
+};
+
+/* Benchmark-derived CPU gaming scores. These are normalized to the Ryzen 7 9850X3D = 1. */
 const GPU_CAL={
- "RTX 5090":1,"RTX 4090":.901,"RTX 5080":.819,"RX 7900 XTX":.793,"RTX 4080 SUPER":.780,"RTX 4080":.772,"RTX 5070 Ti":.762,"RX 9070 XT":.769,"RX 7900 XT":.713,"RTX 4070 Ti SUPER":.693,"RX 9070":.691,"RTX 3090 Ti":.647,
- "RTX 4070 SUPER":.61,"RTX 4070":.55,"RTX 3080":.54,"RX 7800 XT":.54,"RX 7900 GRE":.55,"RTX 3070 Ti":.50,"RTX 3070":.47,"RX 6800 XT":.50,"RX 6800":.45,"RX 7700 XT":.45,"RTX 4060 Ti 16GB":.39,"RTX 4060 Ti 8GB":.39,"RX 6750 XT":.40,"RX 6700 XT":.38,"RTX 4060":.36,"RX 7600 XT":.36,"RX 7600":.34,"RTX 3060 Ti":.40,"RTX 3060":.30,"RX 6600 XT":.31,"RX 6600":.28,"RTX 3050":.22,"GTX 1660 SUPER":.21,"GTX 1660 Ti":.21,"GTX 1660":.19,"GTX 1080 Ti":.29,"GTX 1080":.23,"GTX 1070 Ti":.22,"GTX 1070":.20,"GTX 1060 6GB":.15,"RX 5700 XT":.24,"RX 5700":.20,"RX 5600 XT":.19,"RX 580 8GB":.13,"RX 570 4GB":.11
+ "RTX 5090":1,"RTX 4090":.901,"RTX 5080":.819,"RX 7900 XTX":.793,"RTX 4080 SUPER":.780,"RTX 4080":.772,"RTX 5070 Ti":.762,"RX 9070 XT":.769,"RX 7900 XT":.713,"RTX 4070 Ti SUPER":.693,"RX 9070":.691,"RTX 3090 Ti":.647,"RTX 4070 SUPER":.61,"RTX 4070":.55,"RTX 3080":.54,"RX 7800 XT":.54,"RX 7900 GRE":.55,"RTX 3070 Ti":.50,"RTX 3070":.47,"RX 6800 XT":.50,"RX 6800":.45,"RX 7700 XT":.45,"RTX 4060 Ti 16GB":.438,"RTX 4060 Ti 8GB":.432,"RX 6750 XT":.408,"RX 6700 XT":.389,"RTX 4060":.351,"RX 7600 XT":.501,"RX 7600":.343,"RTX 3060 Ti":.364,"RTX 3060":.302,"RX 6600 XT":.315,"RX 6600":.255,"RTX 3050":.219,"GTX 1660 SUPER":.21,"GTX 1660 Ti":.21,"GTX 1660":.19,"GTX 1080 Ti":.29,"GTX 1080":.23,"GTX 1070 Ti":.22,"GTX 1070":.20,"GTX 1060 6GB":.15,"RX 5700 XT":.24,"RX 5700":.20,"RX 5600 XT":.19,"RX 580 8GB":.13,"RX 570 4GB":.11
 };
 const CPU_CAL={
- "Intel Core i3-12100F":.673,"Intel Core i3-13100F":.710,"Intel Core i3-14100F":.72,"Intel Core i5-12400F":.695,"Intel Core i5-12600K":.786,"Intel Core i5-12600KF":.786,"Intel Core i5-13400F":.740,"Intel Core i5-13600K":.824,"Intel Core i5-14400F":.754,"Intel Core i5-14600K":.858,"Intel Core i5-14600KF":.858,"Intel Core i7-12700K":.797,"Intel Core i7-13700K":.867,"Intel Core i7-14700K":.901,"Intel Core i9-13900K":.924,"Intel Core i9-14900K":.954,"AMD Ryzen 5 5500":.600,"AMD Ryzen 5 5600":.635,"AMD Ryzen 7 5700X":.670,"AMD Ryzen 7 5800X3D":.659,"AMD Ryzen 5 7500F":.65,"AMD Ryzen 5 7600":.715,"AMD Ryzen 7 7800X3D":.88,"AMD Ryzen 7 9700X":.906,"AMD Ryzen 7 9800X3D":.970,"AMD Ryzen 9 9900X":.93,"AMD Ryzen 9 9950X":.957,"AMD Ryzen 7 9850X3D":1
+ "Intel Core i3-12100F":.673,"Intel Core i3-13100F":.710,"Intel Core i3-14100F":.720,
+ "Intel Core i5-12400F":.695,"Intel Core i5-12600K":.608,"Intel Core i5-12600KF":.608,
+ "Intel Core i5-13400F":.580,"Intel Core i5-13600K":.709,"Intel Core i5-14400F":.580,
+ "Intel Core i5-14600K":.728,"Intel Core i5-14600KF":.728,"Intel Core i7-12700K":.658,
+ "Intel Core i7-13700K":.758,"Intel Core i7-14700K":.764,"Intel Core i9-13900K":.768,
+ "Intel Core i9-14900K":.782,
+ /* Legacy Zen 3 values are anchored to published 1080p gaming comparisons. */
+ "AMD Ryzen 5 5500":.578,"AMD Ryzen 5 5600":.682,"AMD Ryzen 7 5700X":.670,"AMD Ryzen 7 5800X3D":.659,
+ "AMD Ryzen 5 7500F":.650,"AMD Ryzen 5 7600":.673,"AMD Ryzen 7 7800X3D":.856,
+ "AMD Ryzen 7 9700X":.726,"AMD Ryzen 7 9800X3D":.970,"AMD Ryzen 9 9900X":.739,
+ "AMD Ryzen 9 9950X":.769,"AMD Ryzen 7 9850X3D":1
 };
+
+/* Direct game anchors: measured/public benchmark results used as calibration points. */
+const GAME_ANCHORS={
+ "Fortnite":{
+   gpu:"RTX 3050",cpu:"AMD Ryzen 5 5500",
+   fps:{1080:{Low:143.4,Medium:103.9,High:82.3,Ultra:51.6},1440:{Low:89.6,Medium:65.7,High:49.7,Ultra:31.3},2160:{Low:49.1,Medium:32.3,High:25.7,Ultra:16.4}}
+ },
+ "Cyberpunk 2077":{
+   gpu:"RTX 3060",cpu:"Intel Core i5-13400F",
+   fps:{1080:{Low:105,Medium:80,High:64,Ultra:48},1440:{Low:72,Medium:58,High:47,Ultra:36},2160:{Low:40,Medium:34,High:27,Ultra:17}}
+ },
+ "Valorant":{
+   gpu:"RTX 3060",cpu:"Intel Core i5-13400F",
+   fps:{1080:{Low:500,Medium:390,High:338,Ultra:260},1440:{Low:360,Medium:285,High:235,Ultra:178},2160:{Low:145,Medium:105,High:82,Ultra:64}}
+ },
+ "Counter-Strike 2":{
+   gpu:"RTX 3060",cpu:"AMD Ryzen 5 5600",
+   fps:{1080:{Low:323,Medium:270,High:245,Ultra:190},1440:{Low:260,Medium:228,High:205,Ultra:165},2160:{Low:150,Medium:99,High:88,Ultra:78}}
+ },
+ "Minecraft":{
+   gpu:"RTX 3050",cpu:"AMD Ryzen 5 5500",
+   fps:{1080:{Low:275,Medium:218,High:173,Ultra:108},1440:{Low:174,Medium:138,High:109,Ultra:68},2160:{Low:91,Medium:72,High:57,Ultra:36}}
+ },
+ "Rocket League":{
+   gpu:"RTX 3050",cpu:"AMD Ryzen 5 5500",
+   fps:{1080:{Low:245,Medium:162,High:155,Ultra:137},1440:{Low:175,Medium:116,High:110,Ultra:97},2160:{Low:109,Medium:72,High:69,Ultra:61}}
+ }
+};
+
+/* Conservative workload multipliers for games without a direct benchmark anchor. */
 const GAME_PROFILE={
- "Minecraft":.82,"Fortnite":.82,"Rocket League":.92,"Counter-Strike 2":1.02,"Valorant":1.14,"Call of Duty: Warzone":.67,"Grand Theft Auto V":.74,"Grand Theft Auto V Enhanced":.55,"Red Dead Redemption 2":.60,"Cyberpunk 2077":.47,"Elden Ring":.72,"Hogwarts Legacy":.52,"Helldivers 2":.49,"Warhammer 40,000: Space Marine 2":.42,"Monster Hunter Wilds":.43,"Black Myth: Wukong":.40,"The Last of Us Part II":.48,"Horizon Forbidden West":.54,"God of War Ragnarök":.55,"Marvel's Spider-Man 2":.45,"Forza Horizon 5":.62,"Forza Motorsport":.50,"Apex Legends":.82,"Overwatch 2":.96,"PUBG: Battlegrounds":.76,"Rainbow Six Siege":1.05,"DOOM Eternal":1.10,"DOOM: The Dark Ages":.46,"Dying Light 2":.55,"Resident Evil 4":.64,"Starfield":.43,"Baldur's Gate 3":.58,"Dragon's Dogma 2":.39,"Assassin's Creed Shadows":.38,"Alan Wake 2":.35,"S.T.A.L.K.E.R. 2":.34,"ARC Raiders":.45,"Marvel Rivals":.63,"Battlefield 2042":.57,"Battlefield 6":.55,"Escape from Tarkov":.52,"Cities: Skylines II":.35,"Assetto Corsa Competizione":.52
+ "Call of Duty: Warzone":.72,"Call of Duty: Black Ops 7":.68,"Call of Duty: Black Ops 6":.70,
+ "Grand Theft Auto V":1.08,"Grand Theft Auto V Enhanced":.78,"Red Dead Redemption 2":.78,
+ "Elden Ring":.96,"Elden Ring Nightreign":.80,"Hogwarts Legacy":.72,"Helldivers 2":.68,
+ "Warhammer 40,000: Space Marine 2":.58,"Monster Hunter Wilds":.60,"Black Myth: Wukong":.55,
+ "The Last of Us Part II":.64,"Horizon Forbidden West":.70,"God of War Ragnarök":.72,
+ "Marvel's Spider-Man 2":.60,"Ghost of Tsushima":.78,"Forza Horizon 5":.82,"Forza Horizon 4":.90,
+ "Forza Motorsport":.68,"F1 25":.78,"F1 24":.82,"EA Sports FC 26":1.15,"EA Sports FC 25":1.15,
+ "NBA 2K26":1.00,"Assassin's Creed Shadows":.52,"Assassin's Creed Mirage":.82,"Assassin's Creed Valhalla":.78,
+ "Far Cry 6":.84,"Far Cry 5":.98,"Rainbow Six Siege":1.35,"Apex Legends":1.00,"Overwatch 2":1.22,
+ "PUBG: Battlegrounds":.90,"Destiny 2":1.00,"THE FINALS":.78,"Delta Force":.70,"Battlefield 6":.64,
+ "Battlefield 2042":.72,"Battlefield V":.95,"Battlefield 1":1.05,"DOOM Eternal":1.35,
+ "DOOM: The Dark Ages":.58,"DOOM":1.35,"Dying Light 2":.74,"Dying Light":.90,"Resident Evil 4":.86,
+ "Resident Evil Village":.95,"Resident Evil 2":1.05,"Starfield":.58,"Star Wars Outlaws":.55,
+ "Avatar: Frontiers of Pandora":.55,"Dragon Age: The Veilguard":.60,"Baldur's Gate 3":.78,
+ "Diablo IV":1.05,"Path of Exile 2":.72,"Path of Exile":.90,"Final Fantasy XVI":.65,
+ "Final Fantasy VII Rebirth":.62,"Kingdom Come: Deliverance II":.58,"Dragon's Dogma 2":.52,"Black Desert":1.10,
+ "ARC Raiders":.66,"Marvel Rivals":.82,"Escape from Tarkov":.68,"Cities: Skylines II":.48,
+ "Assetto Corsa Competizione":.70
 };
+
+function gpuBenchFPS(gpu,res){
+ const row=GPU_BENCH[gpu[0]];
+ const idx=res===1080?0:res===1440?1:res===2160?2:null;
+ if(row&&idx!==null)return row[idx];
+ const score=GPU_CAL[gpu[0]]??gpu[2]??.5;
+ return 203.8*score*(R[res]??1);
+}
+function cpuScore(cpu){return CPU_CAL[cpu[0]]??cpu[1]??.60;}
+function gpuScore(gpu){return GPU_CAL[gpu[0]]??gpu[2]??.50;}
+function genericGameFPS(cpu,gpu,game,res,quality){
+ const base=gpuBenchFPS(gpu,res);
+ const workload=GAME_PROFILE[game]??.72;
+ const q=Q[quality]??1;
+ const cpuS=cpuScore(cpu),gpuS=gpuScore(gpu);
+ /* At higher resolutions the GPU dominates more; at 1080p CPU matters more. */
+ const cpuWeight=res===1080?.28:res===1440?.18:.10;
+ const cpuFactor=.72+cpuWeight*(cpuS/Math.max(.01,gpuS));
+ return base*workload*q*cpuFactor;
+}
+function anchoredGameFPS(cpu,gpu,game,res,quality){
+ const a=GAME_ANCHORS[game];
+ if(!a||!a.fps[res]||a.fps[res][quality]==null)return null;
+ const anchorGpu=DATA.gpus.find(x=>x[0]===a.gpu);
+ const anchorCpu=DATA.cpus.find(x=>x[0]===a.cpu);
+ if(!anchorGpu||!anchorCpu)return null;
+ const gpuRatio=Math.pow(Math.max(.15,gpuBenchFPS(gpu,res)/gpuBenchFPS(anchorGpu,res)),.90);
+ const cpuRatio=Math.max(.75,Math.min(1.18,cpuScore(cpu)/Math.max(.01,cpuScore(anchorCpu))));
+ /* CPU impact is strongest in esports; use a moderate blend for anchored games. */
+ const cpuWeight=(game==='Valorant'||game==='Counter-Strike 2')?.32:.20;
+ return a.fps[res][quality]*gpuRatio*(1-cpuWeight+cpuWeight*cpuRatio);
+}
 function estimateFPS(cpu,gpu,game,res,quality,ram,upscaling,rt){
- const q=qualityFactor(game,quality);
+ const anchored=anchoredGameFPS(cpu,gpu,game,res,quality);
+ let fps=anchored!==null?anchored:genericGameFPS(cpu,gpu,game,res,quality);
  const u=U[upscaling]||1;
- const gpuFPS=gpuCeiling(gpu,res,game)*q*u;
- const cpuFPS=cpuCeiling(cpu,res,game)*q*u;
-
- // GPU is normally the primary limit. Apply a smooth penalty only when CPU
- // capacity falls below the GPU ceiling, instead of forcing every result down.
- const cpuRatio=Math.min(1,cpuFPS/Math.max(1,gpuFPS));
- let fps=gpuFPS*(.72+.28*cpuRatio);
-
- // Memory pressure is deliberately modest: RAM should matter, but not dominate.
+ fps*=u;
  if(ram<16)fps*=.94;
  else if(ram>=32&&res<=1080)fps*=1.015;
-
  if(rt){
-   const rtLoss=gpu[1]==='NVIDIA'&&gpu[0].startsWith('RTX')?.67:
-     (gpu[1]==='AMD'&&/^RX (6|7|9)/.test(gpu[0])?.58:.48);
+   const rtLoss=(gpu[1]==='NVIDIA'&&gpu[0].startsWith('RTX'))?.67:
+     ((gpu[1]==='AMD'&&/^RX (6|7|9)/.test(gpu[0]))?.58:.48);
    fps*=rtLoss;
  }
-
  return Math.max(8,Math.min(500,fps));
+}
+function bottleneck(cpu,gpu,game,res){
+ const c=cpuScore(cpu),g=gpuScore(gpu);
+ /*
+  * Bottleneck is not a comparison of raw CPU/GPU benchmark scores: those
+  * scores use different scales. Instead, estimate how much performance is
+  * lost because the CPU is below the level normally needed by this GPU.
+  * The threshold is deliberately conservative so normal gaming PCs do not
+  * get labelled as heavily CPU-bottlenecked.
+  */
+ const resWeight=res===1080?1.0:res===1440?.58:.32;
+ const gameWeight=(game==='Valorant'||game==='Counter-Strike 2'||game==='Rainbow Six Siege')?1.18:
+                  (game==='Minecraft'||game==='Rocket League'||game==='Fortnite')?1.05:.92;
+ const requiredCpu=.24 + .62*Math.sqrt(Math.max(.01,Math.min(1,g)));
+ const pressure=Math.max(0,(requiredCpu-c)/Math.max(.20,requiredCpu));
+ return Math.round(Math.min(35,pressure*100*resWeight*gameWeight));
+}
+function confidence(cpu,gpu,game){
+ if(GAME_ANCHORS[game]&&GPU_BENCH[gpu[0]]&&CPU_CAL[cpu[0]])return 'High';
+ if(GPU_BENCH[gpu[0]]&&CPU_CAL[cpu[0]])return 'Medium';
+ return 'Low';
 }
 function calculate(){
  const g=DATA.games[state.game],gpu=DATA.gpus[state.gpu],cpu=DATA.cpus[state.cpu],ram=+$('ram').value;
